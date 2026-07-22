@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ImageRis - Image Network Capture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="18" height="18" rx="4" stroke="white" stroke-width="1.8"/>
+          <circle cx="8.5" cy="8.5" r="1.5" fill="white"/>
+          <path d="M3 16l5-5 4 4 3-3 6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="header-title">ImageRis</span>
+    </div>
+    <div class="header-version">v1.0</div>
+  </header>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <!-- Capture Toggle -->
+      <label class="toggle-wrapper" id="captureToggleLabel" title="Toggle image capture">
+        <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="4" fill="currentColor"/>
+          <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="checkbox" id="captureToggle" hidden />
+        <div class="toggle-track">
+          <div class="toggle-thumb"></div>
+        </div>
+        <span class="toggle-label">Capture</span>
+      </label>
+
+      <!-- Clear Button -->
+      <button class="btn-clear" id="clearBtn" title="Clear all captured images">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="toolbar-right">
+      <!-- Export Button -->
+      <button class="btn-export" id="exportBtn" title="Export as JSON">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <!-- View Toggle -->
+      <div class="view-toggle" id="viewToggle">
+        <button class="btn-view" id="viewGridBtn" title="Grid View">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </button>
+        <button class="btn-view" id="viewListBtn" title="List View">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3" y2="6"/>
+            <line x1="3" y1="12" x2="3" y2="12"/>
+            <line x1="3" y1="18" x2="3" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Count Badge -->
+      <div class="count-badge" id="countBadge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2"/>
+          <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
+          <path d="M3 15l4-4 3 3 3-3 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="imageCount">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+        <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by URL..." />
+    </div>
+    <div class="type-filters" id="typeFilters">
+      <button class="filter-chip active" data-type="ALL">All</button>
+      <button class="filter-chip" data-type="JPEG">JPEG</button>
+      <button class="filter-chip" data-type="PNG">PNG</button>
+      <button class="filter-chip" data-type="WEBP">WEBP</button>
+      <button class="filter-chip" data-type="GIF">GIF</button>
+      <button class="filter-chip" data-type="SVG">SVG</button>
+    </div>
+  </div>
+
+  <!-- URL Replacer Tool -->
+  <div class="replacer-bar">
+    <div class="replacer-header">
+      <label class="replacer-toggle-label">
+        <input type="checkbox" id="replacerEnable" />
+        <span class="replacer-toggle-custom"></span>
+        <span class="replacer-title">URL Replacer</span>
+      </label>
+    </div>
+    <div class="replacer-body" id="replacerBody">
+      <div class="replacer-inputs">
+        <div class="replacer-input-group">
+          <span class="replacer-prefix">Find:</span>
+          <input type="text" id="replacerFind" placeholder="e.g. 300:300" class="replacer-input" />
+        </div>
+        <div class="replacer-input-group">
+          <span class="replacer-prefix">Replace:</span>
+          <input type="text" id="replacerReplace" placeholder="e.g. 900:1200" class="replacer-input" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image List -->
+  <main class="image-list" id="imageList">
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" opacity="0.5"/>
+          <path d="M3 16l5-5 4 4 3-3 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+        </svg>
+      </div>
+      <p class="empty-title">No images captured yet</p>
+      <p class="empty-sub">Toggle <strong>Capture</strong> and browse any page to start capturing image requests.</p>
+    </div>
+  </main>
+
+  <!-- Status Bar -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Capture is off</span>
+    <span class="status-size" id="totalSizeText"></span>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Image Details</span>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-preview" id="modalPreview"></div>
+      <div class="modal-info" id="modalInfo"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-action btn-copy" id="modalCopyUrl">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Copy URL
+        </button>
+        <button class="btn-modal-action btn-download" id="modalDownload">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Download
+        </button>
+        <button class="btn-modal-action btn-open" id="modalOpen">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Open
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
